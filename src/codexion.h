@@ -6,7 +6,7 @@
 /*   By: gpatrici <gpatrici@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/01 16:42:29 by gpatrici          #+#    #+#             */
-/*   Updated: 2026/10/12 19:09:55 by gpatrici         ###   ########.fr       */
+/*   Updated: 2026/10/20 15:57:05 by gpatrici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,17 +76,24 @@ struct s_simulation
 	int required_compiles;
 	int cooldown_ms;
 	t_scheduler scheduler;
+	long long start_ms;
 	pthread_mutex_t log_mutex;
 	pthread_mutex_t state_mutex;
 	pthread_cond_t stop_cond;
 	bool stop;
 	int finished_coders;
+	int thread_count;
 	t_dongle *dongles;
 	t_coder *coders;
 };
 
 long long now_ms(void);
 void log_state(t_simulation *sim, int coder_id, const char *msg);
+int usage_error(const char *prog_name);
+int start_monitor(t_simulation *sim, pthread_t *monitor_thread);
+int run_simulation(t_simulation *sim, pthread_t *threads);
+int allocation_error(void);
+int preparation_error(pthread_t *threads);
 int scheduler_from_string(const char *str);
 int parse_ll_arg(const char *str, long long *value);
 int parse_i_arg(const char *str, int *value);
@@ -123,7 +130,7 @@ int monitor_finished(t_simulation *sim);
 void *monitor_routine(void *arg);
 void init_coders(t_simulation *sim);
 void init_dongles(t_simulation *sim);
-void launch_threads(t_simulation *sim, pthread_t *threads);
+int launch_threads(t_simulation *sim, pthread_t *threads);
 void cleanup(t_simulation *sim, pthread_t *threads);
 int prepare_simulation(t_simulation *sim, char **argv, pthread_t *threads);
 

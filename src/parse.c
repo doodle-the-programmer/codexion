@@ -6,13 +6,13 @@
 /*   By: gpatrici <gpatrici@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/01 16:42:38 by gpatrici          #+#    #+#             */
-/*   Updated: 2026/10/20 14:06:02 by gpatrici         ###   ########.fr       */
+/*   Updated: 2026/10/20 15:51:26 by gpatrici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-// Maps the scheduler string to its enum value so the simulation can choose FIFO or EDF.
+// Maps the scheduler string to FIFO or EDF.
 int scheduler_from_string(const char *str)
 {
 	if (strcmp(str, "fifo") == 0)
@@ -22,7 +22,7 @@ int scheduler_from_string(const char *str)
 	return (-1);
 }
 
-// Reads every command-line option into the simulation object and validates it.
+// Reads every command-line option and validates the simulation values.
 int parse_args(t_simulation *sim, char **argv)
 {
 	if (!parse_i_arg(argv[1], &sim->coder_count))

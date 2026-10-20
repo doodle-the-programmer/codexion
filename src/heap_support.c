@@ -6,7 +6,7 @@
 /*   By: gpatrici <gpatrici@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/01 16:42:34 by gpatrici          #+#    #+#             */
-/*   Updated: 2026/10/12 18:01:17 by gpatrici         ###   ########.fr       */
+/*   Updated: 2026/10/20 15:52:06 by gpatrici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void heap_reserve(t_heap *heap)
 {
 	t_request *new_items;
 	size_t cap;
+	size_t i;
 
 	cap = heap->capacity == 0 ? 8 : heap->capacity * 2;
 	new_items = malloc(cap * sizeof(*new_items));
@@ -24,7 +25,12 @@ void heap_reserve(t_heap *heap)
 		return ;
 	if (heap->items)
 	{
-		memcpy(new_items, heap->items, heap->size * sizeof(*new_items));
+		i = 0;
+		while (i < heap->size)
+		{
+			new_items[i] = heap->items[i];
+			i++;
+		}
 		free(heap->items);
 	}
 	heap->items = new_items;

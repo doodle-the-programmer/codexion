@@ -6,7 +6,7 @@
 /*   By: gpatrici <gpatrici@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/01 16:42:36 by gpatrici          #+#    #+#             */
-/*   Updated: 2026/10/20 14:05:53 by gpatrici         ###   ########.fr       */
+/*   Updated: 2026/10/20 15:51:20 by gpatrici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ int parse_i_arg(const char *str, int *value)
 	return (1);
 }
 
-// Validates that the configured simulation values are physically and logically allowed.
+// Validates that the configured simulation values are allowed.
 int valid_values(const t_simulation *sim)
 {
 	if (sim->coder_count <= 0 || sim->burnout_ms <= 0)

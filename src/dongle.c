@@ -6,7 +6,7 @@
 /*   By: gpatrici <gpatrici@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/01 16:42:33 by gpatrici          #+#    #+#             */
-/*   Updated: 2026/10/20 14:05:49 by gpatrici         ###   ########.fr       */
+/*   Updated: 2026/10/20 15:55:17 by gpatrici         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,39 +32,6 @@ void free_dongle(t_dongle *dongle)
 	free_heap(&dongle->queue);
 }
 
-// Tries to claim this dongle while respecting queue order, cooldowns, and waiting.
-int try_acquire_dongle(t_simulation *sim, int dongle_id, int coder_id,
-				long long deadline)
-{
-	t_dongle *dongle;
-	struct timespec ts;
-	long long now;
-
-	dongle = &sim->dongles[dongle_id];
-	pthread_mutex_lock(&dongle->mutex);
-	if (dongle->owner == coder_id)
-	{
-		pthread_mutex_unlock(&dongle->mutex);
-		return (1);
-	}
-	if (!already_waiting(dongle, coder_id))
-		queue_waiter(dongle, coder_id, deadline);
-	while (dongle->owner != coder_id)
-	{
-		now = now_ms();
-		if (can_take_dongle(dongle, coder_id, now, sim->cooldown_ms))
-		{
-			take_dongle_ownership(dongle, coder_id);
-			pthread_mutex_unlock(&dongle->mutex);
-			return (1);
-		}
-		wait_for_turn(&ts);
-		pthread_cond_timedwait(&dongle->cond, &dongle->mutex, &ts);
-	}
-	pthread_mutex_unlock(&dongle->mutex);
-	return (1);
-}
-
 // Releases a dongle back to the pool and wakes any waiting coders.
 void release_dongle(t_simulation *sim, int dongle_id, int coder_id)
 {
@@ -87,17 +54,21 @@ int acquire_pair(t_coder *coder)
 	t_simulation *sim;
 	int left;
 	int right;
+	int first;
+	int second;
 
 	sim = coder->sim;
 	left = (coder->id - 1 + sim->coder_count) % sim->coder_count;
 	right = coder->id % sim->coder_count;
 	if (sim->coder_count == 1)
 		return (try_acquire_dongle(sim, 0, coder->id, coder->deadline_ms));
-	if (!try_acquire_dongle(sim, left, coder->id, coder->deadline_ms))
+	first = left < right ? left : right;
+	second = left < right ? right : left;
+	if (!try_acquire_dongle(sim, first, coder->id, coder->deadline_ms))
 		return (0);
-	if (!try_acquire_dongle(sim, right, coder->id, coder->deadline_ms))
+	if (!try_acquire_dongle(sim, second, coder->id, coder->deadline_ms))
 	{
-		release_dongle(sim, left, coder->id);
+		release_dongle(sim, first, coder->id);
 		return (0);
 	}
 	return (1);
